@@ -1,0 +1,9 @@
+input.txt
+a.out
+docker-compose.yml
+Dockerfile
+testfile.c
+testfile.cpp
+testfile.py
+.dockerignore
+node_modules

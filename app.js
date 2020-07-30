@@ -17,6 +17,7 @@ app.get("/", (req, res) => {
 });
 
 app.post("/compile", async (req, res) => {
+  var options;
   let code = req.body.code;
   let language = req.body.language;
 
@@ -37,15 +38,18 @@ app.post("/compile", async (req, res) => {
   } else if (language == "python") {
     filename = "/testfile.py";
     execname = "python3 testfile.py";
+    options = { timeout: 1000 };
     if (req.body.input) {
       execname += " < input.txt";
     }
   }
 
   fs.writeFileSync(__dirname + filename, code);
-  const compile = exec(execname, { timeout: 1000 }, (err, stdout, stderr) => {
-    if (err && err.signal == "SIGTERM")
-      return res.json({ output: "Time Limit Exceeded" });
+
+  const compile = exec(execname, options, (err) => {
+    if (err && err.signal == "SIGTERM") {
+      return res.json("Time Limit Exceeded");
+    }
   });
 
   compile.stdout.on("data", function (data) {
@@ -68,20 +72,18 @@ app.post("/compile", async (req, res) => {
         if (err && err.signal == "SIGTERM")
           return res.json({ output: "Time Limit Exceeded!" });
       });
-
+      console.log(run.stdout);
       if (run.stdout) {
         run.stdout.on("data", function (output) {
           return res.status(200).send({ output: output });
         });
       }
 
-      if (run.stderr) {
-        run.stderr.on("data", function (output) {
-          return res.send({ output: "Runtime Error!" });
-        });
+      run.stderr.on("data", function (output) {
+        return res.send({ output: "Runtime Error!" });
+      });
 
-        run.on("close", function (output) {});
-      }
+      run.on("close", function (output) {});
     }
   });
 });

@@ -62,8 +62,13 @@ app.post("/compile", async (req, res) => {
   });
 
   compile.stderr.on("data", function (data) {
-    return res.send({ output: data });
+    try {
+      return res.status(501).send({ output: data });      //here
+    } catch (error) {
+      console.log(error);
+    }
   });
+
   compile.on("close", async function (data) {
     if (data == 0 && (language == "c" || language == "cpp")) {
       var execsecond = "./a.out";

@@ -63,7 +63,7 @@ app.post("/compile", async (req, res) => {
 
   compile.stderr.on("data", function (data) {
     try {
-      return res.status(501).send({ output: data });      //here
+      return res.status(501).send({ output: data });
     } catch (error) {
       console.log(error);
     }
@@ -77,7 +77,6 @@ app.post("/compile", async (req, res) => {
         if (err && err.signal == "SIGTERM")
           return res.json({ output: "Time Limit Exceeded!" });
       });
-      console.log(run.stdout);
       if (run.stdout) {
         run.stdout.on("data", function (output) {
           return res.status(200).send({ output: output });
